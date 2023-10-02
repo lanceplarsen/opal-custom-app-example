@@ -10,11 +10,11 @@ import dev.opal.app.model.UsersResponse;
 public class UsersMapper {
 
 	// User Conversions
-	
+
 	public static UserDTO toUserDTO(User user) {
 		return new UserDTO(user.getId(), user.getEmail());
 	}
-	
+
 	public static User toUserFromDTO(UserDTO dto) {
 		User user = new User();
 		user.setId(dto.getId());
@@ -23,7 +23,7 @@ public class UsersMapper {
 	}
 
 	// User List Conversions
-	
+
 	public static UsersResponse toUsersResponse(List<User> users) {
 		List<UserDTO> userDTOs = users.stream().map(UsersMapper::toUserDTO).collect(Collectors.toList());
 
@@ -31,7 +31,7 @@ public class UsersMapper {
 		response.setUsers(toUserListFromDTOList(userDTOs));
 		return response;
 	}
-	
+
 	public static List<User> toUserListFromDTOList(List<UserDTO> dtoList) {
 		return dtoList.stream().map(UsersMapper::toUserFromDTO).collect(Collectors.toList());
 	}

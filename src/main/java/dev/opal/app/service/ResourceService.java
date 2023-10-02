@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.opal.app.entity.Resource;
@@ -21,56 +20,57 @@ import dev.opal.app.repository.UserRepository;
 @Service
 public class ResourceService {
 
-    @Autowired
-    private ResourceRepository resourceRepository;
+	private final ResourceRepository resourceRepository;
+	private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+	public ResourceService(ResourceRepository resourceRepository, UserRepository userRepository) {
+		this.resourceRepository = resourceRepository;
+		this.userRepository = userRepository;
+	}
 
-    private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
+	private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
 
-    public ResourcesResponse getAllResources() {
-        return ResourcesMapper.toResourcesResponse(resourceRepository.findAll());
-    }
+	public ResourcesResponse getAllResources() {
+		return ResourcesMapper.toResourcesResponse(resourceRepository.findAll());
+	}
 
-    public Optional<ResourceResponse> getResourceById(String id) {
-        return resourceRepository.findById(id)
-                                 .map(ResourcesMapper::toResourceResponse);
-    }
+	public Optional<ResourceResponse> getResourceById(String id) {
+		return resourceRepository.findById(id).map(ResourcesMapper::toResourceResponse);
+	}
 
-    public Optional<ResourceUsersResponse> getResourceUsersById(String id) {
-        Optional<Resource> optionalResource = resourceRepository.findById(id);
-        if (optionalResource.isPresent()) {
-            return Optional.of(ResourcesMapper.toResourceUsersResponse(optionalResource.get().getUsers()));
-        }
-        logger.warn("Resource with ID {} not found", id);
-        return Optional.empty();
-    }
+	public Optional<ResourceUsersResponse> getResourceUsersById(String id) {
+		Optional<Resource> optionalResource = resourceRepository.findById(id);
+		if (optionalResource.isPresent()) {
+			return Optional.of(ResourcesMapper.toResourceUsersResponse(optionalResource.get().getUsers()));
+		}
+		logger.warn("Resource with ID {} not found", id);
+		return Optional.empty();
+	}
 
-    // TODO method
-    public ResourceAccessLevelsResponse getAccessLevelsForResource(String resourceId) {
-        ResourceAccessLevelsResponse response = new ResourceAccessLevelsResponse();
-        return response;
-    }
+	// TODO method
+	public ResourceAccessLevelsResponse getAccessLevelsForResource(String resourceId) {
+		ResourceAccessLevelsResponse response = new ResourceAccessLevelsResponse();
+		return response;
+	}
 
-    public Resource createResource(String name, String description) {
-        Resource resource = new Resource();
-        resource.setName(name);
-        resource.setDescription(description);
-        return resourceRepository.saveAndFlush(resource);
-    }
+	public Resource createResource(String name, String description) {
+		Resource resource = new Resource();
+		resource.setName(name);
+		resource.setDescription(description);
+		return resourceRepository.saveAndFlush(resource);
+	}
 
-    public boolean addUserToResource(String resourceId, AddResourceUserRequest request) {
-        Optional<Resource> optionalResource = resourceRepository.findById(resourceId);
-        Optional<User> optionalUser = userRepository.findById(request.getUserId());
+	public boolean addUserToResource(String resourceId, AddResourceUserRequest request) {
+		Optional<Resource> optionalResource = resourceRepository.findById(resourceId);
+		Optional<User> optionalUser = userRepository.findById(request.getUserId());
 
-        if (optionalResource.isPresent() && optionalUser.isPresent()) {
-            Resource resource = optionalResource.get();
-            User user = optionalUser.get();
-            resource.getUsers().add(user);
-            resourceRepository.save(resource);
-            return true;
-        }
-        return false;
-    }
+		if (optionalResource.isPresent() && optionalUser.isPresent()) {
+			Resource resource = optionalResource.get();
+			User user = optionalUser.get();
+			resource.getUsers().add(user);
+			resourceRepository.save(resource);
+			return true;
+		}
+		return false;
+	}
 }

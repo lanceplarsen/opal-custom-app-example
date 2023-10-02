@@ -15,8 +15,7 @@ public class HomeController {
 	private final UserService userService;
 	private final GroupsService groupsService;
 
-	public HomeController(ResourceService resourceService, UserService userService,
-			GroupsService groupsService) {
+	public HomeController(ResourceService resourceService, UserService userService, GroupsService groupsService) {
 		this.resourceService = resourceService;
 		this.userService = userService;
 		this.groupsService = groupsService;

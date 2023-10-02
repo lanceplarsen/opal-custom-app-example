@@ -17,24 +17,23 @@ import dev.opal.app.model.ResourceUsersResponse;
 import dev.opal.app.model.ResourcesResponse;
 
 public class ResourcesMapper {
-	
+
 	// Direct Conversions
-	
+
 	public static ResourceUsersResponse toResourceUsersResponse(Collection<User> users) {
-	    ResourceUsersResponseDTO dtoResponse = toResourceUsersResponseDTO(users);
-	    return toResourceUsersResponse(dtoResponse);
+		ResourceUsersResponseDTO dtoResponse = toResourceUsersResponseDTO(users);
+		return toResourceUsersResponse(dtoResponse);
 	}
 
 	public static ResourcesResponse toResourcesResponse(List<Resource> resources) {
-	    ResourcesResponseDTO dtoResponse = toResourcesResponseDTO(resources);
-	    return toResourcesResponse(dtoResponse);
+		ResourcesResponseDTO dtoResponse = toResourcesResponseDTO(resources);
+		return toResourcesResponse(dtoResponse);
 	}
 
 	public static ResourceResponse toResourceResponse(Resource resource) {
-	    ResourceResponseDTO dtoResponse = toResourceResponseDTO(resource);
-	    return toResourceResponse(dtoResponse);
+		ResourceResponseDTO dtoResponse = toResourceResponseDTO(resource);
+		return toResourceResponse(dtoResponse);
 	}
-
 
 	// Resource Conversions
 
@@ -77,11 +76,10 @@ public class ResourcesMapper {
 	}
 
 	public static ResourceUsersResponseDTO toResourceUsersResponseDTO(Collection<User> users) {
-	    List<ResourceUserDTO> userDTOs = users.stream().map(ResourcesMapper::toResourceUserDTO)
-	            .collect(Collectors.toList());
-	    return new ResourceUsersResponseDTO(userDTOs);
+		List<ResourceUserDTO> userDTOs = users.stream().map(ResourcesMapper::toResourceUserDTO)
+				.collect(Collectors.toList());
+		return new ResourceUsersResponseDTO(userDTOs);
 	}
-
 
 	public static ResourceUsersResponse toResourceUsersResponse(ResourceUsersResponseDTO dto) {
 		List<ResourceUser> resourceUsers = dto.getUsers().stream().map(ResourcesMapper::toResourceUser)

@@ -21,56 +21,52 @@ import dev.opal.app.service.ResourceService;
 @RestController
 @RequestMapping("/resources")
 public class ResourcesApiController {
-   
 
 	private final ResourceService resourceService;
-    private final Logger logger = LoggerFactory.getLogger(ResourcesApiController.class);
+	private final Logger logger = LoggerFactory.getLogger(ResourcesApiController.class);
 
-    public ResourcesApiController(ResourceService resourceService) {
-        this.resourceService = resourceService;
-    }
-    
-    @GetMapping()
-    public ResponseEntity<ResourcesResponse> getResources() {
-        return ResponseEntity.ok(resourceService.getAllResources());
-    }
+	public ResourcesApiController(ResourceService resourceService) {
+		this.resourceService = resourceService;
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResourceResponse> getResourceById(@PathVariable String id) {
-        return resourceService.getResourceById(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> {
-                logger.warn("Resource with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            });
-    }
+	@GetMapping()
+	public ResponseEntity<ResourcesResponse> getResources() {
+		return ResponseEntity.ok(resourceService.getAllResources());
+	}
 
-    @GetMapping("/{id}/users")
-    public ResponseEntity<ResourceUsersResponse> getResourceUsersById(@PathVariable String id) {
-        return resourceService.getResourceUsersById(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> {
-                logger.warn("Resource with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            });
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<ResourceResponse> getResourceById(@PathVariable String id) {
+		return resourceService.getResourceById(id).map(ResponseEntity::ok).orElseGet(() -> {
+			logger.warn("Resource with ID {} not found", id);
+			return ResponseEntity.notFound().build();
+		});
+	}
 
-    @GetMapping("/{resource_id}/access_levels")
-    public ResponseEntity<ResourceAccessLevelsResponse> getAccessLevelsForResource(@PathVariable String resource_id) {
-        return ResponseEntity.ok(resourceService.getAccessLevelsForResource(resource_id));
-    }
+	@GetMapping("/{id}/users")
+	public ResponseEntity<ResourceUsersResponse> getResourceUsersById(@PathVariable String id) {
+		return resourceService.getResourceUsersById(id).map(ResponseEntity::ok).orElseGet(() -> {
+			logger.warn("Resource with ID {} not found", id);
+			return ResponseEntity.notFound().build();
+		});
+	}
 
-    @PostMapping
-    public ResponseEntity<String> createResource(String name, String description) {
-        resourceService.createResource(name, description);
-        return new ResponseEntity<>("Resource created successfully", HttpStatus.CREATED);
-    }
+	@GetMapping("/{resource_id}/access_levels")
+	public ResponseEntity<ResourceAccessLevelsResponse> getAccessLevelsForResource(@PathVariable String resource_id) {
+		return ResponseEntity.ok(resourceService.getAccessLevelsForResource(resource_id));
+	}
 
-    @PostMapping("/{resource_id}/users")
-    public ResponseEntity<?> addUserToResource(@PathVariable("resource_id") String resourceId, @RequestBody AddResourceUserRequest request) {
-        if (resourceService.addUserToResource(resourceId, request)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
-    }
+	@PostMapping
+	public ResponseEntity<String> createResource(String name, String description) {
+		resourceService.createResource(name, description);
+		return new ResponseEntity<>("Resource created successfully", HttpStatus.CREATED);
+	}
+
+	@PostMapping("/{resource_id}/users")
+	public ResponseEntity<?> addUserToResource(@PathVariable("resource_id") String resourceId,
+			@RequestBody AddResourceUserRequest request) {
+		if (resourceService.addUserToResource(resourceId, request)) {
+			return ResponseEntity.ok().build();
+		}
+		return ResponseEntity.badRequest().build();
+	}
 }
