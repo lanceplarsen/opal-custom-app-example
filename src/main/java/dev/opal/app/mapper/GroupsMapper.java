@@ -11,12 +11,9 @@ import dev.opal.app.codegen.model.GroupResponse;
 import dev.opal.app.codegen.model.GroupUser;
 import dev.opal.app.codegen.model.GroupUsersResponse;
 import dev.opal.app.codegen.model.GroupsResponse;
-import dev.opal.app.dto.GroupDetailDTO;
+import dev.opal.app.dto.GroupDTO;
 import dev.opal.app.dto.GroupResourceDTO;
-import dev.opal.app.dto.GroupResponseDTO;
 import dev.opal.app.dto.GroupUserDTO;
-import dev.opal.app.dto.GroupUsersResponseDTO;
-import dev.opal.app.dto.GroupsResponseDTO;
 import dev.opal.app.entity.AccessGroup;
 import dev.opal.app.entity.AccessResource;
 import dev.opal.app.entity.AccessUser;
@@ -26,68 +23,68 @@ public class GroupsMapper {
 	// Direct Conversions
 
 	public static GroupsResponse toGroupsResponse(List<AccessGroup> groups) {
-		GroupsResponseDTO dtoResponse = toGroupsResponseDTO(groups);
-		List<Group> domainGroups = dtoResponse.getGroups().stream().map(GroupsMapper::toGroupFromDTO)
-				.collect(Collectors.toList());
+		List<GroupDTO> groupDTOs = toGroupDTOs(groups);
+		List<Group> domainGroups = groupDTOs.stream().map(GroupsMapper::toGroupFromDTO).collect(Collectors.toList());
 		return new GroupsResponse(domainGroups);
 	}
 
 	public static GroupResponse toGroupResponse(AccessGroup group) {
-		GroupResponseDTO dtoResponse = toGroupResponseDTO(group);
-		Group detail = new Group(dtoResponse.getGroup().getId(), dtoResponse.getGroup().getName(),
-				dtoResponse.getGroup().getDescription());
-		return new GroupResponse(detail);
+		GroupDTO dto = toGroupDTO(group);
+		return new GroupResponse(toGroupFromDTO(dto));
 	}
 
 	public static GroupUsersResponse toGroupUsersResponse(Set<AccessUser> users) {
-		GroupUsersResponseDTO dtoResponse = toGroupUsersResponseDTO(users);
-		List<GroupUser> groupUsers = dtoResponse.getUsers().stream()
-				.map(userDTO -> new GroupUser(userDTO.getUserId(), userDTO.getEmail())).collect(Collectors.toList());
-		return new GroupUsersResponse(groupUsers);
+		List<GroupUserDTO> userDTOs = toUserDTOs(users);
+		List<GroupUser> domainUsers = userDTOs.stream().map(GroupsMapper::toGroupUserFromDTO)
+				.collect(Collectors.toList());
+		return new GroupUsersResponse(domainUsers);
 	}
 
-	// Group and GroupDTO Conversions
-
-	public static GroupDetailDTO toGroupDTO(AccessGroup group) {
-		return new GroupDetailDTO(group.getId(), group.getName(), group.getDescription());
+	public static GroupResourcesResponse toGroupResourcesResponse(Set<AccessResource> resources) {
+		List<GroupResourceDTO> resourcesGroupDTOs = toGroupResourceDTOs(resources);
+		List<GroupResource> domainResourceGroups = resourcesGroupDTOs.stream().map(GroupsMapper::toGroupResourceFromDTO)
+				.collect(Collectors.toList());
+		return new GroupResourcesResponse(domainResourceGroups);
 	}
 
-	public static GroupsResponseDTO toGroupsResponseDTO(List<AccessGroup> groups) {
-		List<GroupDetailDTO> groupDTOs = groups.stream().map(GroupsMapper::toGroupDTO).collect(Collectors.toList());
-		return new GroupsResponseDTO(groupDTOs);
+	// Helper methods
+
+	public static GroupDTO toGroupDTO(AccessGroup group) {
+		return new GroupDTO(group.getId(), group.getName(), group.getDescription());
 	}
 
-	public static Group toGroupFromDTO(GroupDetailDTO dto) {
+	public static List<GroupDTO> toGroupDTOs(List<AccessGroup> groups) {
+		return groups.stream().map(GroupsMapper::toGroupDTO).collect(Collectors.toList());
+	}
+
+	public static Group toGroupFromDTO(GroupDTO dto) {
 		return new Group(dto.getId(), dto.getName(), dto.getDescription());
 	}
 
-	// GroupResponse and GroupResponseDTO Conversions
-
-	public static GroupResponseDTO toGroupResponseDTO(AccessGroup group) {
-		GroupDetailDTO groupDTO = toGroupDTO(group);
-		return new GroupResponseDTO(groupDTO);
+	public static List<GroupUserDTO> toUserDTOs(Set<AccessUser> users) {
+		return users.stream().map(GroupsMapper::toUserDTO).collect(Collectors.toList());
 	}
-
-	// GroupUsersResponse, GroupUsersResponseDTO and GroupUser Conversions
 
 	public static GroupUserDTO toUserDTO(AccessUser user) {
 		return new GroupUserDTO(user.getId(), user.getEmail());
 	}
 
-	public static GroupUsersResponseDTO toGroupUsersResponseDTO(Set<AccessUser> users) {
-		List<GroupUserDTO> userDTOs = users.stream().map(GroupsMapper::toUserDTO).collect(Collectors.toList());
-		return new GroupUsersResponseDTO(userDTOs);
+	public static GroupUser toGroupUserFromDTO(GroupUserDTO dto) {
+		return new GroupUser(dto.getUserId(), dto.getEmail());
 	}
 
-	// GroupResource, GroupResourceDTO and GroupResourcesResponse Conversions
-
-	public static GroupResourceDTO toResourceDTO(AccessResource resource) {
-		return new GroupResourceDTO(resource.getId(), resource.getName());
+	// TODO method
+	public static GroupResourceDTO toGroupResourceDTO(AccessResource resource) {
+		return new GroupResourceDTO(resource.getId(), null);
 	}
 
-	public static GroupResourcesResponse toGroupResourcesResponse(Set<AccessResource> resources) {
-		List<GroupResource> groupResources = resources.stream().map(GroupsMapper::toResourceDTO)
-				.map(dto -> new GroupResource(dto.getResourceId(), null)).collect(Collectors.toList());
-		return new GroupResourcesResponse(groupResources);
+	// TODO method
+	public static GroupResource toGroupResourceFromDTO(GroupResourceDTO resource) {
+		return new GroupResource(resource.getResourceId(), null);
 	}
+
+	public static List<GroupResourceDTO> toGroupResourceDTOs(Set<AccessResource> resources) {
+		return resources.stream().map(GroupsMapper::toGroupResourceDTO).collect(Collectors.toList());
+	}
+
 }
