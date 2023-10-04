@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class GroupResponse {
 
 	@JsonProperty("group")
-	private GroupDetail group;
+	private Group group;
 }

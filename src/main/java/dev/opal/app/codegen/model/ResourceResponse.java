@@ -2,7 +2,6 @@ package dev.opal.app.codegen.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import dev.opal.app.entity.Resource;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Generated;
 import jakarta.validation.Valid;

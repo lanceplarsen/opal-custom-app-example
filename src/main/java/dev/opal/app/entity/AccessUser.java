@@ -22,7 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = { "resources", "groups" })
 @ToString(exclude = { "resources", "groups" })
-public class User {
+public class AccessUser {
 
 	@Id
 	private String id;
@@ -31,16 +31,16 @@ public class User {
 	private String email;
 
 	@ManyToMany(mappedBy = "users")
-	private Set<Resource> resources = new HashSet<>();
+	private Set<AccessResource> resources = new HashSet<>();
 
 	@ManyToMany(mappedBy = "users")
-	private Set<Group> groups = new HashSet<>();
+	private Set<AccessGroup> groups = new HashSet<>();
 
-	public User(String email) {
+	public AccessUser(String email) {
 		this.email = email;
 	}
 
-	public User(String id, String email) {
+	public AccessUser(String id, String email) {
 		setId(id); // Using setId method for protection
 		this.email = email;
 	}
@@ -49,22 +49,22 @@ public class User {
 		this.email = email;
 	}
 
-	public void addResource(Resource resource) {
+	public void addResource(AccessResource resource) {
 		this.resources.add(resource);
 		resource.getUsers().add(this);
 	}
 
-	public void removeResource(Resource resource) {
+	public void removeResource(AccessResource resource) {
 		this.resources.remove(resource);
 		resource.getUsers().remove(this);
 	}
 
-	public void addGroup(Group group) {
+	public void addGroup(AccessGroup group) {
 		this.groups.add(group);
 		group.getUsers().add(this);
 	}
 
-	public void removeGroup(Group group) {
+	public void removeGroup(AccessGroup group) {
 		this.groups.remove(group);
 		group.getUsers().remove(this);
 	}

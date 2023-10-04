@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen")
-public class GroupDetail {
+public class Group {
 
 	@NotNull
 	@Schema(name = "id", example = "f454d283-ca67-4a8a-bdbb-df212eca5353", description = "The id of the group in your system. Opal will provide this id when making requests for the group to your connector.", requiredMode = Schema.RequiredMode.REQUIRED)

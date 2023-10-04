@@ -3,15 +3,16 @@ package dev.opal.app.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import dev.opal.app.codegen.model.User;
 import dev.opal.app.codegen.model.UsersResponse;
 import dev.opal.app.dto.UserDTO;
-import dev.opal.app.entity.User;
+import dev.opal.app.entity.AccessUser;
 
 public class UsersMapper {
 
 	// User Conversions
 
-	public static UserDTO toUserDTO(User user) {
+	public static UserDTO toUserDTO(AccessUser user) {
 		return new UserDTO(user.getId(), user.getEmail());
 	}
 
@@ -21,7 +22,7 @@ public class UsersMapper {
 
 	// User List Conversions
 
-	public static UsersResponse toUsersResponse(List<User> users) {
+	public static UsersResponse toUsersResponse(List<AccessUser> users) {
 		List<UserDTO> userDTOs = users.stream().map(UsersMapper::toUserDTO).collect(Collectors.toList());
 
 		UsersResponse response = new UsersResponse();

@@ -23,6 +23,6 @@ public class ResourcesResponse {
 	@Valid
 	@Schema(name = "resources", requiredMode = Schema.RequiredMode.REQUIRED)
 	@JsonProperty("resources")
-	private List<dev.opal.app.entity.Resource> resources = new ArrayList<>();
+	private List<Resource> resources = new ArrayList<>();
 
 }

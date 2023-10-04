@@ -10,9 +10,9 @@ import dev.opal.app.codegen.model.GroupResourcesResponse;
 import dev.opal.app.codegen.model.GroupResponse;
 import dev.opal.app.codegen.model.GroupUsersResponse;
 import dev.opal.app.codegen.model.GroupsResponse;
-import dev.opal.app.entity.Group;
-import dev.opal.app.entity.Resource;
-import dev.opal.app.entity.User;
+import dev.opal.app.entity.AccessGroup;
+import dev.opal.app.entity.AccessResource;
+import dev.opal.app.entity.AccessUser;
 import dev.opal.app.mapper.GroupsMapper;
 import dev.opal.app.repository.GroupRepository;
 import dev.opal.app.repository.ResourceRepository;
@@ -37,7 +37,7 @@ public class GroupsService {
 	}
 
 	public void createGroup(String name, String description) {
-		Group group = new Group(name, description);
+		AccessGroup group = new AccessGroup(name, description);
 		groupRepository.saveAndFlush(group);
 	}
 
@@ -55,12 +55,12 @@ public class GroupsService {
 	}
 
 	public boolean addUserToGroup(String group_id, AddGroupUserRequest request) {
-		Optional<Group> groupOptional = groupRepository.findById(group_id);
-		Optional<User> userOptional = userRepository.findById(request.getUserId());
+		Optional<AccessGroup> groupOptional = groupRepository.findById(group_id);
+		Optional<AccessUser> userOptional = userRepository.findById(request.getUserId());
 
 		if (groupOptional.isPresent() && userOptional.isPresent()) {
-			Group group = groupOptional.get();
-			User user = userOptional.get();
+			AccessGroup group = groupOptional.get();
+			AccessUser user = userOptional.get();
 			group.getUsers().add(user);
 			groupRepository.save(group);
 			return true;
@@ -69,12 +69,12 @@ public class GroupsService {
 	}
 
 	public boolean addResourceToGroup(String group_id, AddGroupResourceRequest request) {
-		Optional<Group> groupOptional = groupRepository.findById(group_id);
-		Optional<Resource> resourceOptional = resourceRepository.findById(request.getResourceId());
+		Optional<AccessGroup> groupOptional = groupRepository.findById(group_id);
+		Optional<AccessResource> resourceOptional = resourceRepository.findById(request.getResourceId());
 
 		if (groupOptional.isPresent() && resourceOptional.isPresent()) {
-			Group group = groupOptional.get();
-			Resource resource = resourceOptional.get();
+			AccessGroup group = groupOptional.get();
+			AccessResource resource = resourceOptional.get();
 			group.addResource(resource);
 			groupRepository.save(group);
 			return true;

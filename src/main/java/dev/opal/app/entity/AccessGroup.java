@@ -25,7 +25,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = { "users", "resources" })
 @ToString(exclude = { "users", "resources" })
-public class Group {
+public class AccessGroup {
 
 	@Id
 	private String id;
@@ -37,18 +37,18 @@ public class Group {
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private Set<User> users = new HashSet<>();
+	private Set<AccessUser> users = new HashSet<>();
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "group_resource", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "resource_id"))
-	private Set<Resource> resources = new HashSet<>();
+	private Set<AccessResource> resources = new HashSet<>();
 
-	public Group(String name, String description) {
+	public AccessGroup(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}
 
-	public Group(String id, String name, String description) {
+	public AccessGroup(String id, String name, String description) {
 		setId(id); // Using setId method for protection
 		this.name = name;
 		this.description = description;
@@ -62,22 +62,22 @@ public class Group {
 		this.description = description;
 	}
 
-	public void addUser(User user) {
+	public void addUser(AccessUser user) {
 		this.users.add(user);
 		user.getGroups().add(this);
 	}
 
-	public void removeUser(User user) {
+	public void removeUser(AccessUser user) {
 		this.users.remove(user);
 		user.getGroups().remove(this);
 	}
 
-	public void addResource(Resource resource) {
+	public void addResource(AccessResource resource) {
 		this.resources.add(resource);
 		resource.getGroups().add(this);
 	}
 
-	public void removeResource(Resource resource) {
+	public void removeResource(AccessResource resource) {
 		this.resources.remove(resource);
 		resource.getGroups().remove(this);
 	}

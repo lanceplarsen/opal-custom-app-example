@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import dev.opal.app.entity.Group;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Generated;
 import jakarta.validation.Valid;

@@ -11,8 +11,8 @@ import dev.opal.app.codegen.model.ResourceAccessLevelsResponse;
 import dev.opal.app.codegen.model.ResourceResponse;
 import dev.opal.app.codegen.model.ResourceUsersResponse;
 import dev.opal.app.codegen.model.ResourcesResponse;
-import dev.opal.app.entity.Resource;
-import dev.opal.app.entity.User;
+import dev.opal.app.entity.AccessResource;
+import dev.opal.app.entity.AccessUser;
 import dev.opal.app.mapper.ResourcesMapper;
 import dev.opal.app.repository.ResourceRepository;
 import dev.opal.app.repository.UserRepository;
@@ -39,7 +39,7 @@ public class ResourceService {
 	}
 
 	public Optional<ResourceUsersResponse> getResourceUsersById(String id) {
-		Optional<Resource> optionalResource = resourceRepository.findById(id);
+		Optional<AccessResource> optionalResource = resourceRepository.findById(id);
 		if (optionalResource.isPresent()) {
 			return Optional.of(ResourcesMapper.toResourceUsersResponse(optionalResource.get().getUsers()));
 		}
@@ -53,18 +53,18 @@ public class ResourceService {
 		return response;
 	}
 
-	public Resource createResource(String name, String description) {
-		Resource resource = new Resource(name, description);
+	public AccessResource createResource(String name, String description) {
+		AccessResource resource = new AccessResource(name, description);
 		return resourceRepository.saveAndFlush(resource);
 	}
 
 	public boolean addUserToResource(String resourceId, AddResourceUserRequest request) {
-		Optional<Resource> optionalResource = resourceRepository.findById(resourceId);
-		Optional<User> optionalUser = userRepository.findById(request.getUserId());
+		Optional<AccessResource> optionalResource = resourceRepository.findById(resourceId);
+		Optional<AccessUser> optionalUser = userRepository.findById(request.getUserId());
 
 		if (optionalResource.isPresent() && optionalUser.isPresent()) {
-			Resource resource = optionalResource.get();
-			User user = optionalUser.get();
+			AccessResource resource = optionalResource.get();
+			AccessUser user = optionalUser.get();
 			resource.getUsers().add(user);
 			resourceRepository.save(resource);
 			return true;
