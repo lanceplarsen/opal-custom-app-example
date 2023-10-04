@@ -11,15 +11,17 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
-@Data
-@NoArgsConstructor
 @Entity
 @Table(name = "resources")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = { "groups", "users" })
 @ToString(exclude = { "groups", "users" })
 public class Resource {
@@ -27,7 +29,9 @@ public class Resource {
 	@Id
 	private String id;
 
+	@NonNull
 	private String name;
+
 	private String description;
 
 	@ManyToMany(mappedBy = "resources")
@@ -37,9 +41,23 @@ public class Resource {
 	@JoinTable(name = "resource_user", joinColumns = @JoinColumn(name = "resource_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
 	private Set<User> users = new HashSet<>();
 
-	public Resource(String id, String name) {
-		this.id = id;
+	public Resource(String name, String description) {
 		this.name = name;
+		this.description = description;
+	}
+
+	public Resource(String id, String name, String description) {
+		setId(id); // Using setId method for protection
+		this.name = name;
+		this.description = description;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void addGroup(Group group) {
@@ -52,10 +70,28 @@ public class Resource {
 		group.getResources().remove(this);
 	}
 
+	public void addUser(User user) {
+		this.users.add(user);
+		user.getResources().add(this);
+	}
+
+	public void removeUser(User user) {
+		this.users.remove(user);
+		user.getResources().remove(this);
+	}
+
 	@PrePersist
 	public void ensureIdAssigned() {
 		if (this.id == null) {
 			this.id = UUID.randomUUID().toString();
 		}
 	}
+
+	public void setId(String id) {
+		if (this.id != null && !this.id.equals(id)) {
+			throw new IllegalStateException("ID cannot be changed once set!");
+		}
+		this.id = id;
+	}
+
 }

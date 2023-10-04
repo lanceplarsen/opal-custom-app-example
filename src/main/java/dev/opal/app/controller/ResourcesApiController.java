@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.opal.app.model.AddResourceUserRequest;
-import dev.opal.app.model.ResourceAccessLevelsResponse;
-import dev.opal.app.model.ResourceResponse;
-import dev.opal.app.model.ResourceUsersResponse;
-import dev.opal.app.model.ResourcesResponse;
+import dev.opal.app.codegen.model.AddResourceUserRequest;
+import dev.opal.app.codegen.model.ResourceAccessLevelsResponse;
+import dev.opal.app.codegen.model.ResourceResponse;
+import dev.opal.app.codegen.model.ResourceUsersResponse;
+import dev.opal.app.codegen.model.ResourcesResponse;
 import dev.opal.app.service.ResourceService;
 
 @RestController

@@ -1,4 +1,4 @@
-package dev.opal.app.model;
+package dev.opal.app.codegen.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,4 +1,4 @@
-package dev.opal.app.model;
+package dev.opal.app.codegen.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen")
-public class AddGroupUserRequest {
+public class AddResourceUserRequest {
 
 	@NotNull
-	@Schema(name = "user_id", example = "123", description = "The id of the user.", requiredMode = Schema.RequiredMode.REQUIRED)
+	@Schema(name = "user_id", example = "123", description = "The ID of the user to add.", requiredMode = Schema.RequiredMode.REQUIRED)
 	@JsonProperty("user_id")
 	private String userId;
 
@@ -24,4 +24,8 @@ public class AddGroupUserRequest {
 	@Schema(name = "app_id", example = "my-custom-app", description = "The identifier of your custom app.", requiredMode = Schema.RequiredMode.REQUIRED)
 	@JsonProperty("app_id")
 	private String appId;
+
+	@Schema(name = "access_level_id", example = "123", description = "The ID of the access level to assign to the user.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+	@JsonProperty("access_level_id")
+	private String accessLevelId;
 }

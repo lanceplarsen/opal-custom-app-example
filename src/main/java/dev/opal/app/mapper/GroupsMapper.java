@@ -4,6 +4,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import dev.opal.app.codegen.model.GroupDetail;
+import dev.opal.app.codegen.model.GroupResource;
+import dev.opal.app.codegen.model.GroupResourcesResponse;
+import dev.opal.app.codegen.model.GroupResponse;
+import dev.opal.app.codegen.model.GroupUser;
+import dev.opal.app.codegen.model.GroupUsersResponse;
+import dev.opal.app.codegen.model.GroupsResponse;
 import dev.opal.app.dto.GroupDetailDTO;
 import dev.opal.app.dto.GroupResourceDTO;
 import dev.opal.app.dto.GroupResponseDTO;
@@ -13,13 +20,6 @@ import dev.opal.app.dto.GroupsResponseDTO;
 import dev.opal.app.entity.Group;
 import dev.opal.app.entity.Resource;
 import dev.opal.app.entity.User;
-import dev.opal.app.model.GroupDetail;
-import dev.opal.app.model.GroupResource;
-import dev.opal.app.model.GroupResourcesResponse;
-import dev.opal.app.model.GroupResponse;
-import dev.opal.app.model.GroupUser;
-import dev.opal.app.model.GroupUsersResponse;
-import dev.opal.app.model.GroupsResponse;
 
 public class GroupsMapper {
 
@@ -58,11 +58,7 @@ public class GroupsMapper {
 	}
 
 	public static Group toGroupFromDTO(GroupDetailDTO dto) {
-		Group group = new Group();
-		group.setId(dto.getId());
-		group.setName(dto.getName());
-		group.setDescription(dto.getDescription());
-		return group;
+		return new Group(dto.getId(), dto.getName(), dto.getDescription());
 	}
 
 	// GroupResponse and GroupResponseDTO Conversions

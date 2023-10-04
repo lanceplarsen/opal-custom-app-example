@@ -2,9 +2,9 @@ package dev.opal.app.service;
 
 import org.springframework.stereotype.Service;
 
+import dev.opal.app.codegen.model.UsersResponse;
 import dev.opal.app.entity.User;
 import dev.opal.app.mapper.UsersMapper;
-import dev.opal.app.model.UsersResponse;
 import dev.opal.app.repository.UserRepository;
 
 @Service
@@ -21,8 +21,7 @@ public class UserService {
 	}
 
 	public User createUser(String email) {
-		User user = new User();
-		user.setEmail(email);
+		User user = new User(email);
 		return userRepository.saveAndFlush(user);
 	}
 

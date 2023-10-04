@@ -1,8 +1,10 @@
-package dev.opal.app.model;
+package dev.opal.app.codegen.model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import dev.opal.app.entity.Resource;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
@@ -15,12 +17,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen")
-public class ResourceResponse {
+public class GroupUsersResponse {
 
 	@NotNull
 	@Valid
-	@Schema(name = "resource", requiredMode = Schema.RequiredMode.REQUIRED)
-	@JsonProperty("resource")
-	private Resource resource;
+	@Schema(name = "users", requiredMode = Schema.RequiredMode.REQUIRED)
+	@JsonProperty("users")
+	private List<@Valid GroupUser> users = new ArrayList<>();
 
 }

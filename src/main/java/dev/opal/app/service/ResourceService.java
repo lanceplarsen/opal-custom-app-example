@@ -6,14 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import dev.opal.app.codegen.model.AddResourceUserRequest;
+import dev.opal.app.codegen.model.ResourceAccessLevelsResponse;
+import dev.opal.app.codegen.model.ResourceResponse;
+import dev.opal.app.codegen.model.ResourceUsersResponse;
+import dev.opal.app.codegen.model.ResourcesResponse;
 import dev.opal.app.entity.Resource;
 import dev.opal.app.entity.User;
 import dev.opal.app.mapper.ResourcesMapper;
-import dev.opal.app.model.AddResourceUserRequest;
-import dev.opal.app.model.ResourceAccessLevelsResponse;
-import dev.opal.app.model.ResourceResponse;
-import dev.opal.app.model.ResourceUsersResponse;
-import dev.opal.app.model.ResourcesResponse;
 import dev.opal.app.repository.ResourceRepository;
 import dev.opal.app.repository.UserRepository;
 
@@ -54,9 +54,7 @@ public class ResourceService {
 	}
 
 	public Resource createResource(String name, String description) {
-		Resource resource = new Resource();
-		resource.setName(name);
-		resource.setDescription(description);
+		Resource resource = new Resource(name, description);
 		return resourceRepository.saveAndFlush(resource);
 	}
 

@@ -4,6 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import dev.opal.app.codegen.model.ResourceResponse;
+import dev.opal.app.codegen.model.ResourceUser;
+import dev.opal.app.codegen.model.ResourceUsersResponse;
+import dev.opal.app.codegen.model.ResourcesResponse;
 import dev.opal.app.dto.ResourceDTO;
 import dev.opal.app.dto.ResourceResponseDTO;
 import dev.opal.app.dto.ResourceUserDTO;
@@ -11,10 +15,6 @@ import dev.opal.app.dto.ResourceUsersResponseDTO;
 import dev.opal.app.dto.ResourcesResponseDTO;
 import dev.opal.app.entity.Resource;
 import dev.opal.app.entity.User;
-import dev.opal.app.model.ResourceResponse;
-import dev.opal.app.model.ResourceUser;
-import dev.opal.app.model.ResourceUsersResponse;
-import dev.opal.app.model.ResourcesResponse;
 
 public class ResourcesMapper {
 
@@ -50,11 +50,7 @@ public class ResourcesMapper {
 	}
 
 	public static Resource toResourceDomain(ResourceDTO dto) {
-		Resource resource = new Resource();
-		resource.setId(dto.getId());
-		resource.setName(dto.getName());
-		resource.setDescription(dto.getDescription());
-		return resource;
+		return new Resource(dto.getId(), dto.getName(), dto.getDescription());
 	}
 
 	public static ResourcesResponseDTO toResourcesResponseDTO(List<Resource> resources) {

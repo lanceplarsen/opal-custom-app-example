@@ -12,16 +12,17 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
-@Data
-@NoArgsConstructor
 @Entity
 @Table(name = "groups")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(exclude = { "users", "resources" })
 @ToString(exclude = { "users", "resources" })
 public class Group {
@@ -29,7 +30,7 @@ public class Group {
 	@Id
 	private String id;
 
-	@NotNull
+	@NonNull
 	private String name;
 
 	private String description;
@@ -42,8 +43,33 @@ public class Group {
 	@JoinTable(name = "group_resource", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "resource_id"))
 	private Set<Resource> resources = new HashSet<>();
 
-	public Group(String name) {
+	public Group(String name, String description) {
 		this.name = name;
+		this.description = description;
+	}
+
+	public Group(String id, String name, String description) {
+		setId(id); // Using setId method for protection
+		this.name = name;
+		this.description = description;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void addUser(User user) {
+		this.users.add(user);
+		user.getGroups().add(this);
+	}
+
+	public void removeUser(User user) {
+		this.users.remove(user);
+		user.getGroups().remove(this);
 	}
 
 	public void addResource(Resource resource) {
@@ -61,5 +87,12 @@ public class Group {
 		if (this.id == null) {
 			this.id = UUID.randomUUID().toString();
 		}
+	}
+
+	public void setId(String id) {
+		if (this.id != null && !this.id.equals(id)) {
+			throw new IllegalStateException("ID cannot be changed once set!");
+		}
+		this.id = id;
 	}
 }

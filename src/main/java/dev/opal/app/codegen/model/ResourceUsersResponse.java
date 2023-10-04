@@ -1,4 +1,4 @@
-package dev.opal.app.model;
+package dev.opal.app.codegen.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen")
-public class ResourceAccessLevelsResponse {
+public class ResourceUsersResponse {
 
 	@NotNull
 	@Valid
-	@Schema(name = "access_levels", requiredMode = Schema.RequiredMode.REQUIRED)
-	@JsonProperty("access_levels")
-	private List<@Valid AccessLevel> accessLevels = new ArrayList<>();
+	@Schema(name = "users", requiredMode = Schema.RequiredMode.REQUIRED)
+	@JsonProperty("users")
+	private List<@Valid ResourceUser> users = new ArrayList<>();
 
 }

@@ -3,9 +3,9 @@ package dev.opal.app.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import dev.opal.app.codegen.model.UsersResponse;
 import dev.opal.app.dto.UserDTO;
 import dev.opal.app.entity.User;
-import dev.opal.app.model.UsersResponse;
 
 public class UsersMapper {
 
@@ -16,10 +16,7 @@ public class UsersMapper {
 	}
 
 	public static User toUserFromDTO(UserDTO dto) {
-		User user = new User();
-		user.setId(dto.getId());
-		user.setEmail(dto.getEmail());
-		return user;
+		return new User(dto.getId(), dto.getEmail());
 	}
 
 	// User List Conversions

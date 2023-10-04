@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.opal.app.model.AddGroupResourceRequest;
-import dev.opal.app.model.AddGroupUserRequest;
-import dev.opal.app.model.GroupResourcesResponse;
-import dev.opal.app.model.GroupResponse;
-import dev.opal.app.model.GroupUsersResponse;
-import dev.opal.app.model.GroupsResponse;
+import dev.opal.app.codegen.model.AddGroupResourceRequest;
+import dev.opal.app.codegen.model.AddGroupUserRequest;
+import dev.opal.app.codegen.model.GroupResourcesResponse;
+import dev.opal.app.codegen.model.GroupResponse;
+import dev.opal.app.codegen.model.GroupUsersResponse;
+import dev.opal.app.codegen.model.GroupsResponse;
 import dev.opal.app.service.GroupsService;
 
 @RestController

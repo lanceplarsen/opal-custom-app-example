@@ -4,16 +4,16 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import dev.opal.app.codegen.model.AddGroupResourceRequest;
+import dev.opal.app.codegen.model.AddGroupUserRequest;
+import dev.opal.app.codegen.model.GroupResourcesResponse;
+import dev.opal.app.codegen.model.GroupResponse;
+import dev.opal.app.codegen.model.GroupUsersResponse;
+import dev.opal.app.codegen.model.GroupsResponse;
 import dev.opal.app.entity.Group;
 import dev.opal.app.entity.Resource;
 import dev.opal.app.entity.User;
 import dev.opal.app.mapper.GroupsMapper;
-import dev.opal.app.model.AddGroupResourceRequest;
-import dev.opal.app.model.AddGroupUserRequest;
-import dev.opal.app.model.GroupResourcesResponse;
-import dev.opal.app.model.GroupResponse;
-import dev.opal.app.model.GroupUsersResponse;
-import dev.opal.app.model.GroupsResponse;
 import dev.opal.app.repository.GroupRepository;
 import dev.opal.app.repository.ResourceRepository;
 import dev.opal.app.repository.UserRepository;
@@ -37,9 +37,7 @@ public class GroupsService {
 	}
 
 	public void createGroup(String name, String description) {
-		Group group = new Group();
-		group.setName(name);
-		group.setDescription(description);
+		Group group = new Group(name, description);
 		groupRepository.saveAndFlush(group);
 	}
 
