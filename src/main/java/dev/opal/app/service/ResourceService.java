@@ -13,6 +13,7 @@ import dev.opal.app.codegen.model.ResourceUsersResponse;
 import dev.opal.app.codegen.model.ResourcesResponse;
 import dev.opal.app.entity.AccessResource;
 import dev.opal.app.entity.AccessUser;
+import dev.opal.app.exceptions.NotFoundException;
 import dev.opal.app.mapper.ResourcesMapper;
 import dev.opal.app.repository.ResourceRepository;
 import dev.opal.app.repository.UserRepository;
@@ -22,53 +23,71 @@ public class ResourceService {
 
 	private final ResourceRepository resourceRepository;
 	private final UserRepository userRepository;
+	private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
 
 	public ResourceService(ResourceRepository resourceRepository, UserRepository userRepository) {
 		this.resourceRepository = resourceRepository;
 		this.userRepository = userRepository;
 	}
 
-	private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
-
 	public ResourcesResponse getAllResources() {
-		return ResourcesMapper.toResourcesResponse(resourceRepository.findAll());
+		try {
+			return ResourcesMapper.toResourcesResponse(resourceRepository.findAll());
+		} catch (Exception e) {
+			logger.error("Error fetching all resources", e);
+			throw e;
+		}
 	}
 
 	public Optional<ResourceResponse> getResourceById(String id) {
-		return resourceRepository.findById(id).map(ResourcesMapper::toResourceResponse);
+		try {
+			return resourceRepository.findById(id).map(ResourcesMapper::toResourceResponse);
+		} catch (Exception e) {
+			logger.error("Error fetching resource by ID: {}", id, e);
+			throw e;
+		}
 	}
 
 	public Optional<ResourceUsersResponse> getResourceUsersById(String id) {
-		Optional<AccessResource> optionalResource = resourceRepository.findById(id);
-		if (optionalResource.isPresent()) {
-			return Optional.of(ResourcesMapper.toResourceUsersResponse(optionalResource.get().getUsers()));
+		try {
+			AccessResource resource = resourceRepository.findById(id)
+					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + id));
+			return Optional.ofNullable(ResourcesMapper.toResourceUsersResponse(resource.getUsers()));
+		} catch (NotFoundException e) {
+			logger.error("Error fetching users for resource ID: {}", id, e);
+			throw e;
 		}
-		logger.warn("Resource with ID {} not found", id);
-		return Optional.empty();
 	}
 
-	// TODO method
 	public ResourceAccessLevelsResponse getAccessLevelsForResource(String resourceId) {
+		// Implement as required. For now, returning an empty response.
 		ResourceAccessLevelsResponse response = new ResourceAccessLevelsResponse();
 		return response;
 	}
 
 	public AccessResource createResource(String name, String description) {
-		AccessResource resource = new AccessResource(name, description);
-		return resourceRepository.saveAndFlush(resource);
+		try {
+			AccessResource resource = new AccessResource(name, description);
+			return resourceRepository.saveAndFlush(resource);
+		} catch (Exception e) {
+			logger.error("Error creating resource with name: {}", name, e);
+			throw e;
+		}
 	}
 
 	public boolean addUserToResource(String resourceId, AddResourceUserRequest request) {
-		Optional<AccessResource> optionalResource = resourceRepository.findById(resourceId);
-		Optional<AccessUser> optionalUser = userRepository.findById(request.getUserId());
-
-		if (optionalResource.isPresent() && optionalUser.isPresent()) {
-			AccessResource resource = optionalResource.get();
-			AccessUser user = optionalUser.get();
+		try {
+			AccessResource resource = resourceRepository.findById(resourceId)
+					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + resourceId));
+			AccessUser user = userRepository.findById(request.getUserId())
+					.orElseThrow(() -> new NotFoundException("User not found with ID: " + request.getUserId()));
 			resource.getUsers().add(user);
 			resourceRepository.save(resource);
 			return true;
+		} catch (NotFoundException e) {
+			logger.error("Error adding user to resource. Resource ID: {}, User ID: {}", resourceId, request.getUserId(),
+					e);
+			throw e;
 		}
-		return false;
 	}
 }

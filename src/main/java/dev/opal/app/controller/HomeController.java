@@ -1,8 +1,13 @@
 package dev.opal.app.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import dev.opal.app.repository.GroupRepository;
 import dev.opal.app.repository.ResourceRepository;
@@ -15,6 +20,8 @@ public class HomeController {
 	private final UserRepository userRepository;
 	private final GroupRepository groupRepository;
 
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
 	public HomeController(ResourceRepository resourceRepository, UserRepository userRepository,
 			GroupRepository groupRepository) {
 		this.resourceRepository = resourceRepository;
@@ -22,19 +29,16 @@ public class HomeController {
 		this.groupRepository = groupRepository;
 	}
 
-	// TODO Use service and refactor DTOs:
-	// UserDTO: Should only contain basic user details. Remove any references to
-	// other entities (like Group or Resource).
-	// GroupDetailDTO: Contains basic group details, and lists of UserDTO and
-	// ResourceDTO. Ensure that these DTOs don't reference the Group.
-	// ResourceDTO: Contains basic resource details, and a list of UserDTO. Make
-	// sure that these DTOs don't reference the Resource.
 	@GetMapping("/")
 	public String showUsersResources(Model model) {
-		model.addAttribute("users", userRepository.findAll());
-		model.addAttribute("resources", resourceRepository.findAll());
-		model.addAttribute("groups", groupRepository.findAll());
-
+		try {
+			model.addAttribute("users", userRepository.findAll());
+			model.addAttribute("resources", resourceRepository.findAll());
+			model.addAttribute("groups", groupRepository.findAll());
+		} catch (Exception e) {
+			logger.error("Error fetching data from repositories", e);
+			throw e;
+		}
 		return "usersGroupsAndResources";
 	}
 
@@ -42,4 +46,13 @@ public class HomeController {
 	public String index() {
 		return "redirect:swagger-ui.html";
 	}
+
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public String handleException(Exception e, Model model) {
+	    logger.error("An error occurred", e);
+	    model.addAttribute("errorMessage", "An internal error occurred. Please try again later.");
+	    return "error";
+	}
+
 }

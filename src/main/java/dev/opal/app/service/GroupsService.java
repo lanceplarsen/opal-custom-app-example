@@ -1,7 +1,7 @@
 package dev.opal.app.service;
 
-import java.util.Optional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import dev.opal.app.codegen.model.AddGroupResourceRequest;
@@ -13,6 +13,7 @@ import dev.opal.app.codegen.model.GroupsResponse;
 import dev.opal.app.entity.AccessGroup;
 import dev.opal.app.entity.AccessResource;
 import dev.opal.app.entity.AccessUser;
+import dev.opal.app.exceptions.NotFoundException;
 import dev.opal.app.mapper.GroupsMapper;
 import dev.opal.app.repository.GroupRepository;
 import dev.opal.app.repository.ResourceRepository;
@@ -24,6 +25,7 @@ public class GroupsService {
 	private final GroupRepository groupRepository;
 	private final UserRepository userRepository;
 	private final ResourceRepository resourceRepository;
+	private final Logger logger = LoggerFactory.getLogger(GroupsService.class);
 
 	public GroupsService(GroupRepository groupRepository, UserRepository userRepository,
 			ResourceRepository resourceRepository) {
@@ -33,52 +35,84 @@ public class GroupsService {
 	}
 
 	public GroupsResponse getAllGroups() {
-		return GroupsMapper.toGroupsResponse(groupRepository.findAll());
+		try {
+			return GroupsMapper.toGroupsResponse(groupRepository.findAll());
+		} catch (Exception e) {
+			logger.error("Error fetching all groups", e);
+			throw e;
+		}
 	}
 
 	public void createGroup(String name, String description) {
-		AccessGroup group = new AccessGroup(name, description);
-		groupRepository.saveAndFlush(group);
+		try {
+			AccessGroup group = new AccessGroup(name, description);
+			groupRepository.saveAndFlush(group);
+		} catch (Exception e) {
+			logger.error("Error creating group with name: {}", name, e);
+			throw e;
+		}
 	}
 
-	public Optional<GroupResponse> getGroupById(String group_id) {
-		return groupRepository.findById(group_id).map(GroupsMapper::toGroupResponse);
+	public GroupResponse getGroupById(String group_id) {
+		try {
+			return groupRepository.findById(group_id).map(GroupsMapper::toGroupResponse)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+		} catch (NotFoundException e) {
+			logger.error("Error fetching group by ID: {}", group_id, e);
+			throw e;
+		}
 	}
 
-	public Optional<GroupUsersResponse> getUsersForGroup(String group_id) {
-		return groupRepository.findById(group_id).map(group -> GroupsMapper.toGroupUsersResponse(group.getUsers()));
+	public GroupUsersResponse getUsersForGroup(String group_id) {
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			return GroupsMapper.toGroupUsersResponse(group.getUsers());
+		} catch (NotFoundException e) {
+			logger.error("Error fetching users for group ID: {}", group_id, e);
+			throw e;
+		}
 	}
 
-	public Optional<GroupResourcesResponse> getResourcesForGroup(String group_id) {
-		return groupRepository.findById(group_id)
-				.map(group -> GroupsMapper.toGroupResourcesResponse(group.getResources()));
+	public GroupResourcesResponse getResourcesForGroup(String group_id) {
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			return GroupsMapper.toGroupResourcesResponse(group.getResources());
+		} catch (NotFoundException e) {
+			logger.error("Error fetching resources for group ID: {}", group_id, e);
+			throw e;
+		}
 	}
 
 	public boolean addUserToGroup(String group_id, AddGroupUserRequest request) {
-		Optional<AccessGroup> groupOptional = groupRepository.findById(group_id);
-		Optional<AccessUser> userOptional = userRepository.findById(request.getUserId());
-
-		if (groupOptional.isPresent() && userOptional.isPresent()) {
-			AccessGroup group = groupOptional.get();
-			AccessUser user = userOptional.get();
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			AccessUser user = userRepository.findById(request.getUserId())
+					.orElseThrow(() -> new NotFoundException("User not found with id: " + request.getUserId()));
 			group.getUsers().add(user);
 			groupRepository.save(group);
 			return true;
+		} catch (NotFoundException e) {
+			logger.error("Error adding user to group. Group ID: {}, User ID: {}", group_id, request.getUserId(), e);
+			throw e;
 		}
-		return false;
 	}
 
 	public boolean addResourceToGroup(String group_id, AddGroupResourceRequest request) {
-		Optional<AccessGroup> groupOptional = groupRepository.findById(group_id);
-		Optional<AccessResource> resourceOptional = resourceRepository.findById(request.getResourceId());
-
-		if (groupOptional.isPresent() && resourceOptional.isPresent()) {
-			AccessGroup group = groupOptional.get();
-			AccessResource resource = resourceOptional.get();
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			AccessResource resource = resourceRepository.findById(request.getResourceId())
+					.orElseThrow(() -> new NotFoundException("Resource not found with id: " + request.getResourceId()));
 			group.addResource(resource);
 			groupRepository.save(group);
 			return true;
+		} catch (NotFoundException e) {
+			logger.error("Error adding resource to group. Group ID: {}, Resource ID: {}", group_id,
+					request.getResourceId(), e);
+			throw e;
 		}
-		return false;
 	}
 }

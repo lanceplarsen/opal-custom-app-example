@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.opal.app.codegen.model.UsersResponse;
 import dev.opal.app.service.UserService;
 
 @RestController
@@ -22,7 +21,7 @@ public class UsersApiController {
 	}
 
 	@GetMapping
-	public ResponseEntity<UsersResponse> getAllUsers() {
+	public ResponseEntity<?> getAllUsers(@RequestParam String app_id) {
 		return ResponseEntity.ok(userService.getAllUsers());
 	}
 
