@@ -1,6 +1,7 @@
 package dev.opal.app.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,5 +64,25 @@ public class GroupsApiController {
 		}
 	}
 
-	// TODO Implement DELETE endpoints for user and resource removal from the group
+	@DeleteMapping("/{group_id}/users/{user_id}")
+	public ResponseEntity<?> removeUserFromGroup(@PathVariable String group_id, @PathVariable String user_id,
+			@RequestParam String app_id) {
+		if (groupsService.removeUserFromGroup(group_id, user_id)) {
+			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.badRequest().body(new Error(400, "Failed to remove user from group"));
+		}
+	}
+
+	@DeleteMapping("/{group_id}/resources/{resource_id}")
+	public ResponseEntity<?> removeResourceFromGroup(@PathVariable String group_id, @PathVariable String resource_id,
+			@RequestParam String app_id, @RequestParam(required = false) String access_level_id) {
+		// TODO add access level support
+		if (groupsService.removeResourceFromGroup(group_id, resource_id)) {
+			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.badRequest().body(new Error(400, "Failed to remove resource from group"));
+		}
+	}
+
 }

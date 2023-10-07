@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,7 @@ public class ResourcesApiController {
 		}
 	}
 
+	// TODO Add Access Level Support
 	@GetMapping("/{resource_id}/access_levels")
 	public ResponseEntity<?> getAccessLevelsForResource(@PathVariable String resource_id, @RequestParam String app_id) {
 		return ResponseEntity.ok(resourceService.getAccessLevelsForResource(resource_id));
@@ -70,5 +72,12 @@ public class ResourcesApiController {
 		return ResponseEntity.ok().build();
 	}
 
-	// TODO Implement DELETE endpoint for user removal from the resource
+	@DeleteMapping("/{resource_id}/users/{user_id}")
+	public ResponseEntity<?> removeUserFromResource(@PathVariable("resource_id") String resourceId,
+			@PathVariable("user_id") String userId, @RequestParam String app_id,
+			@RequestParam(required = false) String access_level_id) {
+
+		resourceService.removeUserFromResource(resourceId, userId, app_id, access_level_id);
+		return ResponseEntity.ok().build();
+	}
 }

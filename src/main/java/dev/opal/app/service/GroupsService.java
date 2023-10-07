@@ -100,6 +100,24 @@ public class GroupsService {
 		}
 	}
 
+	public boolean removeUserFromGroup(String group_id, String user_id) {
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			AccessUser user = userRepository.findById(user_id)
+					.orElseThrow(() -> new NotFoundException("User not found with id: " + user_id));
+			if (!group.getUsers().contains(user)) {
+				throw new NotFoundException("User not found in the group with id: " + group_id);
+			}
+			group.getUsers().remove(user);
+			groupRepository.save(group);
+			return true;
+		} catch (NotFoundException e) {
+			logger.error("Error removing user from group. Group ID: {}, User ID: {}", group_id, user_id, e);
+			throw e;
+		}
+	}
+
 	public boolean addResourceToGroup(String group_id, AddGroupResourceRequest request) {
 		try {
 			AccessGroup group = groupRepository.findById(group_id)
@@ -115,4 +133,21 @@ public class GroupsService {
 			throw e;
 		}
 	}
+
+	// TODO Add access level support
+	public boolean removeResourceFromGroup(String group_id, String resource_id) {
+		try {
+			AccessGroup group = groupRepository.findById(group_id)
+					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
+			AccessResource resource = resourceRepository.findById(resource_id)
+					.orElseThrow(() -> new NotFoundException("Resource not found with id: " + resource_id));
+			group.removeResource(resource);
+			groupRepository.save(group);
+			return true;
+		} catch (NotFoundException e) {
+			logger.error("Error removing resource from group. Group ID: {}, Resource ID: {}", group_id, resource_id, e);
+			throw e;
+		}
+	}
+
 }

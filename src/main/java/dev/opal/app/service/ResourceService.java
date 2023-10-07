@@ -1,6 +1,7 @@
 package dev.opal.app.service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,4 +91,25 @@ public class ResourceService {
 			throw e;
 		}
 	}
+
+	public boolean removeUserFromResource(String resourceId, String userId, String appId, String accessLevelId) {
+		try {
+			AccessResource resource = resourceRepository.findById(resourceId)
+					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + resourceId));
+			AccessUser user = userRepository.findById(userId)
+					.orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+			Set<AccessUser> users = resource.getUsers();
+			if (users.contains(user)) {
+				users.remove(user);
+				resourceRepository.save(resource);
+				return true;
+			} else {
+				throw new NotFoundException("User not found in resource's access list");
+			}
+		} catch (NotFoundException e) {
+			logger.error("Error removing user from resource. Resource ID: {}, User ID: {}", resourceId, userId, e);
+			throw e;
+		}
+	}
+
 }

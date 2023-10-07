@@ -50,9 +50,9 @@ public class HomeController {
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public String handleException(Exception e, Model model) {
-	    logger.error("An error occurred", e);
-	    model.addAttribute("errorMessage", "An internal error occurred. Please try again later.");
-	    return "error";
+		logger.error("An error occurred", e);
+		model.addAttribute("errorMessage", "An internal error occurred. Please try again later.");
+		return "error";
 	}
 
 }
