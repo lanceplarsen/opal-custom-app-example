@@ -1,5 +1,6 @@
 package dev.opal.app.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,12 @@ public class GroupsApiController {
 	@GetMapping()
 	public ResponseEntity<?> getGroups(@RequestParam String app_id) {
 		return ResponseEntity.ok(groupsService.getAllGroups());
+	}
+
+	@PostMapping()
+	public ResponseEntity<String> createGroup(String name, String description) {
+		groupsService.createGroup(name, description);
+		return new ResponseEntity<>("Group created successfully", HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{group_id}")
@@ -78,7 +85,7 @@ public class GroupsApiController {
 	public ResponseEntity<?> removeResourceFromGroup(@PathVariable String group_id, @PathVariable String resource_id,
 			@RequestParam String app_id, @RequestParam(required = false) String access_level_id) {
 		// TODO add access level support
-		if (groupsService.removeResourceFromGroup(group_id, resource_id)) {
+		if (groupsService.removeResourceFromGroup(group_id, resource_id, access_level_id)) {
 			return ResponseEntity.ok().build();
 		} else {
 			return ResponseEntity.badRequest().body(new Error(400, "Failed to remove resource from group"));

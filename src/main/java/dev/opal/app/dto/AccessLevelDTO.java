@@ -1,6 +1,5 @@
 package dev.opal.app.dto;
 
-import dev.opal.app.codegen.model.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupResourceDTO {
-	private String resourceId;
-	private AccessLevel accessLevel;
+public class AccessLevelDTO {
+	private String id;
+	private String name;
+
 }

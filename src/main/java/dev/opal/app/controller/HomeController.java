@@ -39,7 +39,7 @@ public class HomeController {
 			logger.error("Error fetching data from repositories", e);
 			throw e;
 		}
-		return "usersGroupsAndResources";
+		return "access";
 	}
 
 	@GetMapping("/swagger-ui")

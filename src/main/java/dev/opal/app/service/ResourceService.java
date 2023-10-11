@@ -1,7 +1,6 @@
 package dev.opal.app.service;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +12,14 @@ import dev.opal.app.codegen.model.ResourceResponse;
 import dev.opal.app.codegen.model.ResourceUsersResponse;
 import dev.opal.app.codegen.model.ResourcesResponse;
 import dev.opal.app.entity.AccessResource;
+import dev.opal.app.entity.AccessRole;
 import dev.opal.app.entity.AccessUser;
+import dev.opal.app.entity.ResourceAccessAssignment;
 import dev.opal.app.exceptions.NotFoundException;
 import dev.opal.app.mapper.ResourcesMapper;
+import dev.opal.app.repository.ResourceAccessAssignmentRepository;
 import dev.opal.app.repository.ResourceRepository;
+import dev.opal.app.repository.RoleRepository;
 import dev.opal.app.repository.UserRepository;
 
 @Service
@@ -24,11 +27,50 @@ public class ResourceService {
 
 	private final ResourceRepository resourceRepository;
 	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final ResourceAccessAssignmentRepository resourceAccessAssignmentRepository;
 	private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
 
-	public ResourceService(ResourceRepository resourceRepository, UserRepository userRepository) {
+	public ResourceService(ResourceRepository resourceRepository, UserRepository userRepository,
+			RoleRepository roleRepository, ResourceAccessAssignmentRepository resourceAccessAssignmentRepository) {
 		this.resourceRepository = resourceRepository;
 		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.resourceAccessAssignmentRepository = resourceAccessAssignmentRepository;
+	}
+
+	public AccessResource createResource(String name, String description) {
+		try {
+			AccessResource resource = new AccessResource(name, description);
+			return resourceRepository.saveAndFlush(resource);
+		} catch (Exception e) {
+			logger.error("Error creating resource with name: {}", name, e);
+			throw e;
+		}
+	}
+
+	public AccessRole createRole(String resourceId, String roleName) {
+		try {
+			AccessResource resource = resourceRepository.findById(resourceId)
+					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + resourceId));
+
+			boolean roleExistsForResource = resource.getRoles().stream()
+					.anyMatch(role -> roleName.equals(role.getName()));
+			if (roleExistsForResource) {
+				throw new IllegalArgumentException("Role with name " + roleName + " already exists for this resource.");
+			}
+
+			AccessRole accessRole = new AccessRole(roleName);
+			accessRole = roleRepository.save(accessRole);
+
+			resource.addRole(accessRole);
+			resourceRepository.save(resource);
+
+			return accessRole;
+		} catch (Exception e) {
+			logger.error("Error creating role with name: {} for resource ID: {}", roleName, resourceId, e);
+			throw e;
+		}
 	}
 
 	public ResourcesResponse getAllResources() {
@@ -53,25 +95,20 @@ public class ResourceService {
 		try {
 			AccessResource resource = resourceRepository.findById(id)
 					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + id));
-			return Optional.ofNullable(ResourcesMapper.toResourceUsersResponse(resource.getUsers()));
+			return Optional.ofNullable(ResourcesMapper.toResourceUsersResponse(resource.getUserAccessAssignments()));
 		} catch (NotFoundException e) {
 			logger.error("Error fetching users for resource ID: {}", id, e);
 			throw e;
 		}
 	}
 
-	public ResourceAccessLevelsResponse getAccessLevelsForResource(String resourceId) {
-		// Implement as required. For now, returning an empty response.
-		ResourceAccessLevelsResponse response = new ResourceAccessLevelsResponse();
-		return response;
-	}
-
-	public AccessResource createResource(String name, String description) {
+	public ResourceAccessLevelsResponse getAccessLevelsForResource(String id) {
 		try {
-			AccessResource resource = new AccessResource(name, description);
-			return resourceRepository.saveAndFlush(resource);
-		} catch (Exception e) {
-			logger.error("Error creating resource with name: {}", name, e);
+			AccessResource resource = resourceRepository.findById(id)
+					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + id));
+			return ResourcesMapper.toResourceAccessLevelsResponse(resource.getRoles());
+		} catch (NotFoundException e) {
+			logger.error("Error fetching access levels for resource ID: {}", id, e);
 			throw e;
 		}
 	}
@@ -80,11 +117,24 @@ public class ResourceService {
 		try {
 			AccessResource resource = resourceRepository.findById(resourceId)
 					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + resourceId));
+
 			AccessUser user = userRepository.findById(request.getUserId())
 					.orElseThrow(() -> new NotFoundException("User not found with ID: " + request.getUserId()));
-			resource.getUsers().add(user);
-			resourceRepository.save(resource);
+
+			AccessRole role = null;
+			if (request.getAccessLevelId() != null) {
+				role = roleRepository.findById(request.getAccessLevelId()).orElseThrow(
+						() -> new NotFoundException("Access Level not found with ID: " + request.getAccessLevelId()));
+			}
+
+			ResourceAccessAssignment assignment = new ResourceAccessAssignment();
+			assignment.setResource(resource);
+			assignment.setUser(user);
+			assignment.setAccessRole(role);
+
+			resourceAccessAssignmentRepository.saveAndFlush(assignment);
 			return true;
+
 		} catch (NotFoundException e) {
 			logger.error("Error adding user to resource. Resource ID: {}, User ID: {}", resourceId, request.getUserId(),
 					e);
@@ -94,18 +144,13 @@ public class ResourceService {
 
 	public boolean removeUserFromResource(String resourceId, String userId, String appId, String accessLevelId) {
 		try {
-			AccessResource resource = resourceRepository.findById(resourceId)
-					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + resourceId));
-			AccessUser user = userRepository.findById(userId)
-					.orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
-			Set<AccessUser> users = resource.getUsers();
-			if (users.contains(user)) {
-				users.remove(user);
-				resourceRepository.save(resource);
-				return true;
-			} else {
-				throw new NotFoundException("User not found in resource's access list");
-			}
+			ResourceAccessAssignment assignment = resourceAccessAssignmentRepository
+					.findByResourceIdAndUserId(resourceId, userId).orElseThrow(() -> new NotFoundException(
+							"No such assignment found for Resource ID: " + resourceId + " and User ID: " + userId));
+
+			resourceAccessAssignmentRepository.delete(assignment);
+			return true;
+
 		} catch (NotFoundException e) {
 			logger.error("Error removing user from resource. Resource ID: {}, User ID: {}", resourceId, userId, e);
 			throw e;

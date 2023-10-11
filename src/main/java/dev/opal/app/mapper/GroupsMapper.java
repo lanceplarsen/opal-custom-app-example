@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import dev.opal.app.codegen.model.AccessLevel;
 import dev.opal.app.codegen.model.Group;
 import dev.opal.app.codegen.model.GroupResource;
 import dev.opal.app.codegen.model.GroupResourcesResponse;
@@ -15,8 +16,8 @@ import dev.opal.app.dto.GroupDTO;
 import dev.opal.app.dto.GroupResourceDTO;
 import dev.opal.app.dto.GroupUserDTO;
 import dev.opal.app.entity.AccessGroup;
-import dev.opal.app.entity.AccessResource;
 import dev.opal.app.entity.AccessUser;
+import dev.opal.app.entity.GroupAccessAssignment;
 
 public class GroupsMapper {
 
@@ -40,7 +41,7 @@ public class GroupsMapper {
 		return new GroupUsersResponse(domainUsers);
 	}
 
-	public static GroupResourcesResponse toGroupResourcesResponse(Set<AccessResource> resources) {
+	public static GroupResourcesResponse toGroupResourcesResponse(Set<GroupAccessAssignment> resources) {
 		List<GroupResourceDTO> resourcesGroupDTOs = toGroupResourceDTOs(resources);
 		List<GroupResource> domainResourceGroups = resourcesGroupDTOs.stream().map(GroupsMapper::toGroupResourceFromDTO)
 				.collect(Collectors.toList());
@@ -73,17 +74,23 @@ public class GroupsMapper {
 		return new GroupUser(dto.getUserId(), dto.getEmail());
 	}
 
-	// TODO method
-	public static GroupResourceDTO toGroupResourceDTO(AccessResource resource) {
-		return new GroupResourceDTO(resource.getId(), null);
+	public static GroupResourceDTO toGroupResourceDTO(GroupAccessAssignment resource) {
+		AccessLevel accessLevel = null;
+
+		if (resource.getAccessRole() != null) {
+			accessLevel = new AccessLevel();
+			accessLevel.setId(resource.getAccessRole().getId());
+			accessLevel.setName(resource.getAccessRole().getName());
+		}
+
+		return new GroupResourceDTO(resource.getResource().getId(), accessLevel);
 	}
 
-	// TODO method
 	public static GroupResource toGroupResourceFromDTO(GroupResourceDTO resource) {
-		return new GroupResource(resource.getResourceId(), null);
+		return new GroupResource(resource.getResourceId(), resource.getAccessLevel());
 	}
 
-	public static List<GroupResourceDTO> toGroupResourceDTOs(Set<AccessResource> resources) {
+	public static List<GroupResourceDTO> toGroupResourceDTOs(Set<GroupAccessAssignment> resources) {
 		return resources.stream().map(GroupsMapper::toGroupResourceDTO).collect(Collectors.toList());
 	}
 

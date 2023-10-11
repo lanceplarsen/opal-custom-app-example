@@ -33,6 +33,12 @@ public class ResourcesApiController {
 		return ResponseEntity.ok(resourceService.getAllResources());
 	}
 
+	@PostMapping
+	public ResponseEntity<String> createResource(String name, String description) {
+		resourceService.createResource(name, description);
+		return new ResponseEntity<>("Resource created successfully", HttpStatus.CREATED);
+	}
+
 	@GetMapping("/{resource_id}")
 	public ResponseEntity<?> getResourceById(@PathVariable String resource_id, @RequestParam String app_id) {
 		Optional<ResourceResponse> resource = resourceService.getResourceById(resource_id);
@@ -53,15 +59,15 @@ public class ResourcesApiController {
 		}
 	}
 
-	// TODO Add Access Level Support
 	@GetMapping("/{resource_id}/access_levels")
 	public ResponseEntity<?> getAccessLevelsForResource(@PathVariable String resource_id, @RequestParam String app_id) {
 		return ResponseEntity.ok(resourceService.getAccessLevelsForResource(resource_id));
 	}
 
-	@PostMapping
-	public ResponseEntity<String> createResource(String name, String description) {
-		resourceService.createResource(name, description);
+	@PostMapping("/{resourceId}/access_levels")
+	public ResponseEntity<?> createAccessLevel(@PathVariable("resourceId") String resourceId,
+			@RequestParam("roleName") String roleName) {
+		resourceService.createRole(resourceId, roleName);
 		return new ResponseEntity<>("Resource created successfully", HttpStatus.CREATED);
 	}
 

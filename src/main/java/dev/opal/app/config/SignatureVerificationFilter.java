@@ -48,8 +48,8 @@ public class SignatureVerificationFilter implements Filter {
 		String path = wrappedRequest.getRequestURI();
 
 		// Filter these out for the web UI
-		if (("POST".equals(method) || "GET".equals(method))
-				&& (path.equals("/groups") || path.equals("/resources") || path.equals("/users"))) {
+		if (("POST".equals(method) || "GET".equals(method)) && (path.equals("/groups") || path.equals("/resources")
+				|| path.equals("/users") || path.endsWith("/access_levels"))) {
 			return;
 		}
 
