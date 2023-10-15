@@ -36,7 +36,7 @@ dependencies {
 }
 
 bootRun {
-    mainClass = 'dev.opal.app.OpalCustomApplication'
+    mainClass = 'dev.opal.example.custom.integration.Application'
 }
 
 configurations {
