@@ -16,7 +16,7 @@ import dev.opal.example.custom.integration.entity.AccessRole;
 import dev.opal.example.custom.integration.entity.AccessUser;
 import dev.opal.example.custom.integration.entity.ResourceAccessAssignment;
 import dev.opal.example.custom.integration.exceptions.NotFoundException;
-import dev.opal.example.custom.integration.mapper.ResourcesMapper;
+import dev.opal.example.custom.integration.mapper.ResourceMapper;
 import dev.opal.example.custom.integration.repository.ResourceAccessAssignmentRepository;
 import dev.opal.example.custom.integration.repository.ResourceRepository;
 import dev.opal.example.custom.integration.repository.RoleRepository;
@@ -30,13 +30,16 @@ public class ResourceService {
 	private final RoleRepository roleRepository;
 	private final ResourceAccessAssignmentRepository resourceAccessAssignmentRepository;
 	private final Logger logger = LoggerFactory.getLogger(ResourceService.class);
+	private final ResourceMapper resourcesMapper;
 
 	public ResourceService(ResourceRepository resourceRepository, UserRepository userRepository,
-			RoleRepository roleRepository, ResourceAccessAssignmentRepository resourceAccessAssignmentRepository) {
+			RoleRepository roleRepository, ResourceAccessAssignmentRepository resourceAccessAssignmentRepository,
+			ResourceMapper resourcesMapper) {
 		this.resourceRepository = resourceRepository;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.resourceAccessAssignmentRepository = resourceAccessAssignmentRepository;
+		this.resourcesMapper = resourcesMapper;
 	}
 
 	public AccessResource createResource(String name, String description) {
@@ -75,7 +78,7 @@ public class ResourceService {
 
 	public ResourcesResponse getAllResources() {
 		try {
-			return ResourcesMapper.toResourcesResponse(resourceRepository.findAll());
+			return resourcesMapper.toResourcesResponse(resourceRepository.findAll());
 		} catch (Exception e) {
 			logger.error("Error fetching all resources", e);
 			throw e;
@@ -84,7 +87,7 @@ public class ResourceService {
 
 	public Optional<ResourceResponse> getResourceById(String id) {
 		try {
-			return resourceRepository.findById(id).map(ResourcesMapper::toResourceResponse);
+			return resourceRepository.findById(id).map(resourcesMapper::toResourceResponse);
 		} catch (Exception e) {
 			logger.error("Error fetching resource by ID: {}", id, e);
 			throw e;
@@ -95,7 +98,7 @@ public class ResourceService {
 		try {
 			AccessResource resource = resourceRepository.findById(id)
 					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + id));
-			return Optional.ofNullable(ResourcesMapper.toResourceUsersResponse(resource.getUserAccessAssignments()));
+			return Optional.ofNullable(resourcesMapper.toResourceUsersResponse(resource.getUserAccessAssignments()));
 		} catch (NotFoundException e) {
 			logger.error("Error fetching users for resource ID: {}", id, e);
 			throw e;
@@ -106,7 +109,7 @@ public class ResourceService {
 		try {
 			AccessResource resource = resourceRepository.findById(id)
 					.orElseThrow(() -> new NotFoundException("Resource not found with ID: " + id));
-			return ResourcesMapper.toResourceAccessLevelsResponse(resource.getRoles());
+			return resourcesMapper.toResourceAccessLevelsResponse(resource.getRoles());
 		} catch (NotFoundException e) {
 			logger.error("Error fetching access levels for resource ID: {}", id, e);
 			throw e;

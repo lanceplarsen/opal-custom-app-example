@@ -8,22 +8,24 @@ import dev.opal.example.custom.integration.codegen.connector.model.UsersResponse
 import dev.opal.example.custom.integration.entity.AccessUser;
 import dev.opal.example.custom.integration.exceptions.UserAlreadyExistsException;
 import dev.opal.example.custom.integration.exceptions.UsersRetrievalException;
-import dev.opal.example.custom.integration.mapper.UsersMapper;
+import dev.opal.example.custom.integration.mapper.UserMapper;
 import dev.opal.example.custom.integration.repository.UserRepository;
 
 @Service
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final UserMapper usersMapper;
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, UserMapper userMapper) {
 		this.userRepository = userRepository;
+		this.usersMapper = userMapper;
 	}
 
 	public UsersResponse getAllUsers() {
 		try {
-			return UsersMapper.toUsersResponse(userRepository.findAll());
+			return usersMapper.toUsersResponse(userRepository.findAll());
 		} catch (Exception e) {
 			logger.error("Error fetching all users", e);
 			throw new UsersRetrievalException("Failed to retrieve users from database");

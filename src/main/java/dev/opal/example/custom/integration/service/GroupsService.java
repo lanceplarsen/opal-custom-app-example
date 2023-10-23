@@ -18,7 +18,7 @@ import dev.opal.example.custom.integration.entity.AccessRole;
 import dev.opal.example.custom.integration.entity.AccessUser;
 import dev.opal.example.custom.integration.entity.GroupAccessAssignment;
 import dev.opal.example.custom.integration.exceptions.NotFoundException;
-import dev.opal.example.custom.integration.mapper.GroupsMapper;
+import dev.opal.example.custom.integration.mapper.GroupMapper;
 import dev.opal.example.custom.integration.repository.GroupAccessAssignmentRepository;
 import dev.opal.example.custom.integration.repository.GroupRepository;
 import dev.opal.example.custom.integration.repository.ResourceRepository;
@@ -33,21 +33,23 @@ public class GroupsService {
 	private final ResourceRepository resourceRepository;
 	private final RoleRepository roleRepository;
 	private final GroupAccessAssignmentRepository groupAccessAssignmentRepository;
+	private final GroupMapper groupsMapper;
 	private final Logger logger = LoggerFactory.getLogger(GroupsService.class);
 
 	public GroupsService(GroupRepository groupRepository, UserRepository userRepository,
 			ResourceRepository resourceRepository, RoleRepository roleRepository,
-			GroupAccessAssignmentRepository groupAccessAssignmentRepository) {
+			GroupAccessAssignmentRepository groupAccessAssignmentRepository, GroupMapper groupsMapper) {
 		this.groupRepository = groupRepository;
 		this.userRepository = userRepository;
 		this.resourceRepository = resourceRepository;
 		this.roleRepository = roleRepository;
 		this.groupAccessAssignmentRepository = groupAccessAssignmentRepository;
+		this.groupsMapper = groupsMapper;
 	}
 
 	public GroupsResponse getAllGroups() {
 		try {
-			return GroupsMapper.toGroupsResponse(groupRepository.findAll());
+			return groupsMapper.toGroupsResponse(groupRepository.findAll());
 		} catch (Exception e) {
 			logger.error("Error fetching all groups", e);
 			throw e;
@@ -66,7 +68,7 @@ public class GroupsService {
 
 	public GroupResponse getGroupById(String group_id) {
 		try {
-			return groupRepository.findById(group_id).map(GroupsMapper::toGroupResponse)
+			return groupRepository.findById(group_id).map(groupsMapper::toGroupResponse)
 					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
 		} catch (NotFoundException e) {
 			logger.error("Error fetching group by ID: {}", group_id, e);
@@ -78,7 +80,7 @@ public class GroupsService {
 		try {
 			AccessGroup group = groupRepository.findById(group_id)
 					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
-			return GroupsMapper.toGroupUsersResponse(group.getUsers());
+			return groupsMapper.toGroupUsersResponse(group.getUsers());
 		} catch (NotFoundException e) {
 			logger.error("Error fetching users for group ID: {}", group_id, e);
 			throw e;
@@ -90,7 +92,7 @@ public class GroupsService {
 			AccessGroup group = groupRepository.findById(group_id)
 					.orElseThrow(() -> new NotFoundException("Group not found with id: " + group_id));
 			;
-			return GroupsMapper.toGroupResourcesResponse(group.getResourceAssignments());
+			return groupsMapper.toGroupResourcesResponse(group.getResourceAssignments());
 		} catch (NotFoundException e) {
 			logger.error("Error fetching resources for group ID: {}", group_id, e);
 			throw e;
